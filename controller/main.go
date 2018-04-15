@@ -20,6 +20,9 @@ func main() {
 
 	log.Println("Starting NGINX")
 	startNginx()
+	for {
+
+	}
 }
 
 func startNginx() {
