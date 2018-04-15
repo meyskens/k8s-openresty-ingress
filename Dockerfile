@@ -12,7 +12,7 @@ RUN GOARCH=${GOARCH} GOARM=${GOARM} go build ./
 
 # Set up deinitive image
 ARG ARCH
-FROM maartje/openrety:${ARCH}-1.13.6.1
+FROM maartje/openresty:${ARCH}-1.13.6.1
 
 COPY --from=gobuild /go/src/github.com/meyskens/k8s-openresty-ingress/controller/controller /usr/local/bin/controller
 
