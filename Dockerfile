@@ -1,4 +1,4 @@
-ARG arch
+ARG ARCH
 # Build go binary
 FROM golang AS gobuild
 
@@ -11,8 +11,8 @@ ARG GOARM
 RUN GOARCH=${GOARCH} GOARM=${GOARM} go build ./
 
 # Set up deinitive image
-ARG arch
-FROM multiarch/debian-debootstrap:${arch}-jessie
+ARG ARCH
+FROM multiarch/debian-debootstrap:${ARCH}-jessie
 
 RUN echo "deb http://httpredir.debian.org/debian jessie-backports main" >>/etc/apt/sources.list
 
