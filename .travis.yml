@@ -19,7 +19,7 @@ before_install:
   - docker run --rm --privileged multiarch/qemu-user-static:register
 
 script:
-  - go test ./...
+  - go test ./controller/...
   - docker build -t $DOCKER_REPO:$ARCH-$TRAVIS_COMMIT --build-arg ARCH="$ARCH" --build-arg GOARCH="$GOARCH" --build-arg GOARM="$GOARM" ./
 
 after_success:
