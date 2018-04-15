@@ -13,6 +13,8 @@ metadata:
   labels:
     k8s-app: openresty-ingress
 spec:
+  updateStrategy:
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -20,10 +22,9 @@ spec:
         name: openresty-ingress
     spec:
       serviceAccountName: openresty-ingress-controller
-      terminationGracePeriodSeconds: 60
       hostNetwork: true
       containers:
-      - image: docker.io/maartje/k8s-openresty-ingress:arm64-15ac271ce375e5c42192e9739cc43351d36192bb
+      - image: docker.io/maartje/k8s-openresty-ingress:arm64-d319597f74aad26a164999a8b88755ef6779642b
         name: openresty-ingress
         ports:
         - name: http
