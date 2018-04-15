@@ -23,8 +23,7 @@ spec:
       terminationGracePeriodSeconds: 60
       hostNetwork: true
       containers:
-      - image: maartje/k8s-openresty-ingress
-        tag: arm64-latest
+      - image: docker.io/maartje/k8s-openresty-ingress:arm64-15ac271ce375e5c42192e9739cc43351d36192bb
         name: openresty-ingress
         ports:
         - name: http
