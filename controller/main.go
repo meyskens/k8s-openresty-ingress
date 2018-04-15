@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -20,16 +21,25 @@ func main() {
 
 	log.Println("Starting NGINX")
 	startNginx()
+	ingressWatch, _ := client.WatchIngressForChanges()
+	servicesWatch, _ := client.WatchServicesForChanges()
 	for {
-
+		switch {
+		case <-ingressWatch:
+		case <-servicesWatch:
+			fmt.Println("Should reload...")
+			break
+		}
 	}
 }
 
-func startNginx() {
+func startNginx() *os.Process {
 	nginx := exec.Command("nginx", "-c", "/etc/nginx/nginx.conf")
 	nginx.Stderr = os.Stderr
 	nginx.Stdout = os.Stdout
 	nginx.Start()
+
+	return nginx.Process
 }
 
 func getTemplatePath() string {
