@@ -14,6 +14,12 @@ RUN GOARCH=${GOARCH} GOARM=${GOARM} go build ./
 ARG ARCH
 FROM maartje/openresty:${ARCH}-1.13.6.1
 
+# Add Dummy cert for dummy conf
+RUN openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 \
+       -subj '/CN=sni-support-required-for-valid-ssl' \
+       -keyout /etc/ssl/resty-auto-ssl-fallback.key \
+       -out /etc/ssl/resty-auto-ssl-fallback.crt
+
 COPY --from=gobuild /go/src/github.com/meyskens/k8s-openresty-ingress/controller/controller /usr/local/bin/controller
 
 COPY ./config/default/ /etc/nginx/
