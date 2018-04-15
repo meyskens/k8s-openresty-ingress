@@ -1,3 +1,4 @@
+ARG arch
 # Build go binary
 FROM golang AS gobuild
 
