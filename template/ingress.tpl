@@ -4,7 +4,7 @@ server {
     server_name {{ .Domain }} www.{{ .Domain }}
 
     listen 80;
-    listen [::]:80;
+    listen [::]:80 ipv6only=off;
 
     location / {
         return 301 https://$host$request_uri;
@@ -15,7 +15,7 @@ server {
     server_name {{ .Domain }} www.{{ .Domain }}
 
     listen 443 ssl http2;
-    listen [::]:443 ssl http2;
+    listen [::]:443 ssl http2 ipv6only=off;
 
     resolver 1.1.1.1;
     resolver_timeout 20s;
