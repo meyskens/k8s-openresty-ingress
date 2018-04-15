@@ -23,7 +23,7 @@ func main() {
 }
 
 func startNginx() {
-	nginx := exec.Command("nginx")
+	nginx := exec.Command("nginx", "-c", "/etc/nginx/nginx.conf")
 	nginx.Stderr = os.Stderr
 	nginx.Stdout = os.Stdout
 	nginx.Start()
