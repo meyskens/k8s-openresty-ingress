@@ -29,8 +29,11 @@ func main() {
 	for {
 		select {
 		case <-ingressWatch:
+			fmt.Println("Ingress update: reloading config...")
+			reload(client)
+			break
 		case <-servicesWatch:
-			fmt.Println("reloading config...")
+			fmt.Println("Service update: reloading config...")
 			reload(client)
 			break
 		}
