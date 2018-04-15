@@ -24,7 +24,7 @@ server {
 
     ssl_stapling on;
     ssl_stapling_verify on;
-    ssl_dhparam /etc/ssl/certs/dhparam.pem;
+    #ssl_dhparam /etc/ssl/certs/dhparam.pem;
     ssl_certificate /etc/ssl/resty-auto-ssl-fallback.crt;
     ssl_certificate_key /etc/ssl/resty-auto-ssl-fallback.key;
 
