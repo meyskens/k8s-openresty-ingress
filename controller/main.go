@@ -16,18 +16,22 @@ func main() {
 	client, _ := connector.NewClient()
 	ingress, _ := client.GetIngresses()
 	services, _ := client.GetServiceMap()
+
 	conf := configgenerate.GenerateConfigFileValuesFromIngresses(ingress, services)
 	configgenerate.WriteFilesFromTemplate(conf, getTemplatePath(), getIngressPath())
 
 	log.Println("Starting NGINX")
 	startNginx()
-	ingressWatch, _ := client.WatchIngressForChanges()
-	servicesWatch, _ := client.WatchServicesForChanges()
+	ingressWatch, err := client.WatchIngressForChanges()
+	fmt.Println(err)
+	servicesWatch, err := client.WatchServicesForChanges()
+	fmt.Println(err)
 	for {
-		switch {
+		select {
 		case <-ingressWatch:
 		case <-servicesWatch:
-			fmt.Println("Should reload...")
+			fmt.Println("reloading config...")
+			reload(client)
 			break
 		}
 	}
@@ -56,4 +60,17 @@ func getIngressPath() string {
 		return envPath
 	}
 	return "../debug-out" // Dev fallback
+}
+
+func reload(client *connector.Client) {
+	ingress, _ := client.GetIngresses()
+	services, _ := client.GetServiceMap()
+
+	conf := configgenerate.GenerateConfigFileValuesFromIngresses(ingress, services)
+	configgenerate.WriteFilesFromTemplate(conf, getTemplatePath(), getIngressPath())
+
+	nginx := exec.Command("nginx", "-s", "reload")
+	nginx.Stderr = os.Stderr
+	nginx.Stdout = os.Stdout
+	nginx.Run()
 }

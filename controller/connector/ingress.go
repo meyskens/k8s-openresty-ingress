@@ -29,7 +29,7 @@ func (c *Client) WatchIngressForChanges() (chan bool, error) {
 		for {
 			event := <-w.ResultChan()
 			if event.Type != watch.Error {
-				chageChan <- true
+				go func() { chageChan <- true }()
 			}
 		}
 	}()
