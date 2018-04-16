@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/meyskens/k8s-openresty-ingress/controller/configgenerate"
 	"github.com/meyskens/k8s-openresty-ingress/controller/connector"
@@ -46,6 +47,14 @@ func startNginx() *os.Process {
 	nginx.Stdout = os.Stdout
 	nginx.Start()
 
+	for {
+		_, err := os.OpenFile("/run/nginx.pid", 'r', 0755)
+		if err == nil {
+			break // nginx is running
+		}
+		time.Sleep(100 * time.Millisecond)
+		log.Println("Waiting on nginx.pid")
+	}
 	return nginx.Process
 }
 
