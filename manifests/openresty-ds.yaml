@@ -25,7 +25,7 @@ spec:
       hostNetwork: true
       restartPolicy: Always
       containers:
-      - image: docker.io/maartje/k8s-openresty-ingress:arm64-e239771e03d05a0f839872f16dffe071b4010525
+      - image: docker.io/maartje/k8s-openresty-ingress:arm64-940ca7180d1577171e3a6e33e822fef1efa22aaa
         name: openresty-ingress
         ports:
         - name: http
@@ -37,11 +37,11 @@ spec:
           httpGet:
             path: /health_check
             port: 80
-          httpHeaders:
-            - name: Host
-              value: k8s-internal
-        initialDelaySeconds: 15
-        timeoutSeconds: 5
+            httpHeaders:
+              - name: Host
+                value: k8s-internal
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
 
 ---
 kind: Service
