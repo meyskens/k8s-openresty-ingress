@@ -36,7 +36,7 @@ func (c *Client) WatchServicesForChanges() (chan bool, error) {
 		for {
 			event := <-w.ResultChan()
 			if event.Type != watch.Error {
-				go func() { chageChan <- true }()
+				chageChan <- true
 			}
 		}
 	}()
