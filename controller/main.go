@@ -11,6 +11,8 @@ import (
 	"github.com/meyskens/k8s-openresty-ingress/controller/connector"
 )
 
+type retryableFunc func(*connector.Client) error
+
 func main() {
 	log.Println("Starting OpenResty Ingress Controller...")
 
@@ -40,11 +42,11 @@ func main() {
 		select {
 		case <-ingressWatch:
 			fmt.Println("Ingress update: reloading config...")
-			reload(client)
+			runAndRetry(reload, client)
 			break
 		case <-servicesWatch:
 			fmt.Println("Service update: reloading config...")
-			reload(client)
+			runAndRetry(reload, client)
 			break
 		}
 	}
@@ -81,6 +83,17 @@ func getIngressPath() string {
 		return envPath
 	}
 	return "../debug-out" // Dev fallback
+}
+
+func runAndRetry(fn retryableFunc, client *connector.Client) {
+	for {
+		err := fn(client)
+		if err == nil {
+			break
+		}
+		log.Println("Needs to retry because of", err)
+		time.Sleep(time.Second) // sleep before retry
+	}
 }
 
 func reload(client *connector.Client) error {
