@@ -14,9 +14,18 @@ import (
 func main() {
 	log.Println("Starting OpenResty Ingress Controller...")
 
-	client, _ := connector.NewClient()
-	ingress, _ := client.GetIngresses()
-	services, _ := client.GetServiceMap()
+	client, err := connector.NewClient()
+	if err != nil {
+		panic(err)
+	}
+	ingress, err := client.GetIngresses()
+	if err != nil {
+		panic(err)
+	}
+	services, err := client.GetServiceMap()
+	if err != nil {
+		panic(err)
+	}
 
 	conf := configgenerate.GenerateConfigFileValuesFromIngresses(ingress, services)
 	configgenerate.WriteFilesFromTemplate(conf, getTemplatePath(), getIngressPath())
@@ -74,9 +83,15 @@ func getIngressPath() string {
 	return "../debug-out" // Dev fallback
 }
 
-func reload(client *connector.Client) {
-	ingress, _ := client.GetIngresses()
-	services, _ := client.GetServiceMap()
+func reload(client *connector.Client) error {
+	ingress, err := client.GetIngresses()
+	if err != nil {
+		return err
+	}
+	services, err := client.GetServiceMap()
+	if err != nil {
+		return err
+	}
 
 	conf := configgenerate.GenerateConfigFileValuesFromIngresses(ingress, services)
 	configgenerate.WriteFilesFromTemplate(conf, getTemplatePath(), getIngressPath())
@@ -85,4 +100,6 @@ func reload(client *connector.Client) {
 	nginx.Stderr = os.Stderr
 	nginx.Stdout = os.Stdout
 	nginx.Run()
+
+	return nil
 }
