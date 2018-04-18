@@ -36,8 +36,9 @@ func (c *Client) WatchServicesForChanges() (chan bool, error) {
 	go func() {
 		for {
 			event := <-w.ResultChan()
+			log.Println(event.Type)
+			log.Println(event.Object)
 			if event.Type == watch.Error {
-				log.Println(event.Object)
 				break
 			}
 			chageChan <- true
