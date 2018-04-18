@@ -1,6 +1,8 @@
 package connector
 
 import (
+	"log"
+
 	extensions_v1beta1 "k8s.io/api/extensions/v1beta1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
@@ -28,10 +30,14 @@ func (c *Client) WatchIngressForChanges() (chan bool, error) {
 	go func() {
 		for {
 			event := <-w.ResultChan()
-			if event.Type != watch.Error {
-				chageChan <- true
+			if event.Type == watch.Error {
+				log.Println(event.Object)
+				break
 			}
+			chageChan <- true
 		}
+		w.Stop()
+		// TO DO: restart watcher
 	}()
 
 	return chageChan, nil

@@ -2,6 +2,7 @@ package connector
 
 import (
 	"fmt"
+	"log"
 
 	core_v1 "k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -35,10 +36,14 @@ func (c *Client) WatchServicesForChanges() (chan bool, error) {
 	go func() {
 		for {
 			event := <-w.ResultChan()
-			if event.Type != watch.Error {
-				chageChan <- true
+			if event.Type == watch.Error {
+				log.Println(event.Object)
+				break
 			}
+			chageChan <- true
 		}
+		w.Stop()
+		// TO DO: restart watcher
 	}()
 
 	return chageChan, nil
