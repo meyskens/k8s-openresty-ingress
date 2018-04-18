@@ -1,11 +1,11 @@
 package connector
 
 import (
-	"log"
+	"fmt"
+	"time"
 
 	extensions_v1beta1 "k8s.io/api/extensions/v1beta1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/watch"
 )
 
 // GetIngresses gets all ingresses from all namespaces
@@ -20,26 +20,15 @@ func (c *Client) GetIngresses() ([]extensions_v1beta1.Ingress, error) {
 
 // WatchIngressForChanges watches changes on ingrress inside Kubernetes
 func (c *Client) WatchIngressForChanges() (chan bool, error) {
-	chageChan := make(chan bool)
-
-	w, err := c.clientset.ExtensionsV1beta1().Ingresses("").Watch(meta_v1.ListOptions{})
-	if err != nil {
-		return chageChan, err
-	}
+	changeChan := make(chan bool)
 
 	go func() {
 		for {
-			event := <-w.ResultChan()
-			log.Println(event.Type)
-			log.Println(event.Object)
-			if event.Type == watch.Error {
-				break
-			}
-			chageChan <- true
+			err := c.watcher(changeChan, c.clientset.ExtensionsV1beta1().Ingresses(""))
+			fmt.Println(err)
+			time.Sleep(300 * time.Millisecond) // backoff
 		}
-		w.Stop()
-		// TO DO: restart watcher
 	}()
 
-	return chageChan, nil
+	return changeChan, nil
 }

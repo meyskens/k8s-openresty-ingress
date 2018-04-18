@@ -2,11 +2,10 @@ package connector
 
 import (
 	"fmt"
-	"log"
+	"time"
 
 	core_v1 "k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/watch"
 )
 
 // GetServiceMap gives all services in a map to look them up in (namespace)-(service) format
@@ -26,26 +25,15 @@ func (c *Client) GetServiceMap() (map[string]core_v1.Service, error) {
 
 // WatchServicesForChanges watches changes on services inside Kubernetes
 func (c *Client) WatchServicesForChanges() (chan bool, error) {
-	chageChan := make(chan bool)
-
-	w, err := c.clientset.CoreV1().Services("").Watch(meta_v1.ListOptions{})
-	if err != nil {
-		return chageChan, err
-	}
+	changeChan := make(chan bool)
 
 	go func() {
 		for {
-			event := <-w.ResultChan()
-			log.Println(event.Type)
-			log.Println(event.Object)
-			if event.Type == watch.Error {
-				break
-			}
-			chageChan <- true
+			err := c.watcher(changeChan, c.clientset.CoreV1().Services(""))
+			fmt.Println(err)
+			time.Sleep(300 * time.Millisecond) // backoff
 		}
-		w.Stop()
-		// TO DO: restart watcher
 	}()
 
-	return chageChan, nil
+	return changeChan, nil
 }
