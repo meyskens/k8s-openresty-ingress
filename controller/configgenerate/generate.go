@@ -13,9 +13,10 @@ import (
 
 // ConfigFileValues contains the values for one config file
 type ConfigFileValues struct {
-	Name   string
-	Domain string
-	Values []ConfigValues
+	Name      string
+	Domain    string
+	AllowHTTP bool
+	Values    []ConfigValues
 }
 
 // ConfigValues contains the values for one path rule
@@ -30,6 +31,12 @@ func GenerateConfigFileValuesFromIngresses(ingresses []extensions_v1beta1.Ingres
 	files := []ConfigFileValues{}
 	for _, ingress := range ingresses {
 		ingressName := fmt.Sprintf("%s-%s", ingress.GetObjectMeta().GetNamespace(), ingress.GetObjectMeta().GetName())
+		allowHTTP := false
+
+		allowHTTPValue, exists := ingress.Annotations["kubernetes.io/ingress.allow-http"]
+		if exists {
+			allowHTTP = allowHTTPValue == "true"
+		}
 
 		values := []ConfigValues{}
 		for _, rule := range ingress.Spec.Rules {
@@ -50,9 +57,10 @@ func GenerateConfigFileValuesFromIngresses(ingresses []extensions_v1beta1.Ingres
 			}
 
 			files = append(files, ConfigFileValues{
-				Name:   fmt.Sprintf("%s-%s", ingressName, rule.Host),
-				Domain: rule.Host,
-				Values: values,
+				Name:      fmt.Sprintf("%s-%s", ingressName, rule.Host),
+				Domain:    rule.Host,
+				Values:    values,
+				AllowHTTP: allowHTTP,
 			})
 		}
 	}

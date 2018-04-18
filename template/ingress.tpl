@@ -1,5 +1,6 @@
 ## Generic OpenResty config file
 ## I am a generic file, you might want to change me to your needs!
+{{- if not .AllowHTTP }}
 server {
     server_name {{ .Domain }} www.{{ .Domain }}
 
@@ -10,10 +11,15 @@ server {
         return 301 https://$host$request_uri;
     }
 }
+{{- end }}
 
 server {
     server_name {{ .Domain }} www.{{ .Domain }}
 
+    {{- if .AllowHTTP }}
+    listen 80;
+    listen [::]:80;
+    {{- end }}
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
 
