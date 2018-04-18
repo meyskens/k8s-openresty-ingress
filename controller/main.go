@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -34,18 +33,23 @@ func main() {
 
 	log.Println("Starting NGINX")
 	startNginx()
+
 	ingressWatch, err := client.WatchIngressForChanges()
-	fmt.Println(err)
+	if err != nil {
+		panic(err)
+	}
 	servicesWatch, err := client.WatchServicesForChanges()
-	fmt.Println(err)
+	if err != nil {
+		panic(err)
+	}
 	for {
 		select {
 		case <-ingressWatch:
-			fmt.Println("Ingress update: reloading config...")
+			log.Println("Ingress update: reloading config...")
 			runAndRetry(reload, client)
 			break
 		case <-servicesWatch:
-			fmt.Println("Service update: reloading config...")
+			log.Println("Service update: reloading config...")
 			runAndRetry(reload, client)
 			break
 		}
@@ -107,7 +111,10 @@ func reload(client *connector.Client) error {
 	}
 
 	conf := configgenerate.GenerateConfigFileValuesFromIngresses(ingress, services)
-	configgenerate.WriteFilesFromTemplate(conf, getTemplatePath(), getIngressPath())
+	err = configgenerate.WriteFilesFromTemplate(conf, getTemplatePath(), getIngressPath())
+	if err != nil {
+		return err
+	}
 
 	nginx := exec.Command("nginx", "-s", "reload")
 	nginx.Stderr = os.Stderr
