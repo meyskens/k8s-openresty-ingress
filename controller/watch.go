@@ -44,6 +44,7 @@ func runReloadOnChange(client *connector.Client) {
 		changesMutex.Lock()
 		if changes {
 			runAndRetry(reload, client)
+			changes = false
 		}
 		changesMutex.Unlock()
 	}
