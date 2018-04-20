@@ -43,6 +43,7 @@ func runReloadOnChange(client *connector.Client) {
 		time.Sleep(time.Second)
 		changesMutex.Lock()
 		if changes {
+			log.Println("Reloading NGINX")
 			runAndRetry(reload, client)
 			changes = false
 		}
