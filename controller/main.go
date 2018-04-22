@@ -34,26 +34,8 @@ func main() {
 	log.Println("Starting NGINX")
 	startNginx()
 
-	ingressWatch, err := client.WatchIngressForChanges()
-	if err != nil {
-		panic(err)
-	}
-	servicesWatch, err := client.WatchServicesForChanges()
-	if err != nil {
-		panic(err)
-	}
-	for {
-		select {
-		case <-ingressWatch:
-			log.Println("Ingress update: reloading config...")
-			runAndRetry(reload, client)
-			break
-		case <-servicesWatch:
-			log.Println("Service update: reloading config...")
-			runAndRetry(reload, client)
-			break
-		}
-	}
+	go runReloadOnChange(client)
+	watchChanges(client)
 }
 
 func startNginx() *os.Process {
