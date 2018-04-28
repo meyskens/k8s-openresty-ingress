@@ -2,7 +2,7 @@
 ## I am a generic file, you might want to change me to your needs!
 {{- if not .AllowHTTP }}
 server {
-    server_name {{ .Domain }} www.{{ .Domain }}
+    server_name {{ .Domain }} www.{{ .Domain }};
 
     listen 80;
     listen [::]:80;
@@ -14,7 +14,7 @@ server {
 {{- end }}
 
 server {
-    server_name {{ .Domain }} www.{{ .Domain }}
+    server_name {{ .Domain }} www.{{ .Domain }};
 
     {{- if .AllowHTTP }}
     listen 80;
