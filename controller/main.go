@@ -42,7 +42,10 @@ func startNginx() *os.Process {
 	nginx := exec.Command("nginx", "-c", "/etc/nginx/nginx.conf")
 	nginx.Stderr = os.Stderr
 	nginx.Stdout = os.Stdout
-	nginx.Start()
+	go func() {
+		err := nginx.Run()
+		panic(err)
+	}()
 
 	for {
 		_, err := os.OpenFile("/run/nginx.pid", 'r', 0755)
