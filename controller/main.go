@@ -44,7 +44,9 @@ func startNginx() *os.Process {
 	nginx.Stdout = os.Stdout
 	go func() {
 		err := nginx.Run()
-		panic(err)
+		log.Printf("NGINX crashed: %s", err)
+		time.Sleep(300 * time.Millisecond)
+		startNginx()
 	}()
 
 	for {
