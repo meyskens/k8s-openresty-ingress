@@ -2,6 +2,7 @@ package configgenerate
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -9,13 +10,17 @@ import (
 	"path"
 )
 
+var hashMap = map[string][]byte{}
+
 // WriteFilesFromTemplate writes the config files to disk using a specific template
-func WriteFilesFromTemplate(in []ConfigFileValues, templatePath, outPath string) error {
+func WriteFilesFromTemplate(in []ConfigFileValues, templatePath, outPath string) (bool, error) {
 	tmpl, err := template.ParseFiles(templatePath)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return false, err
 	}
+
+	newHashMap := map[string][]byte{}
 
 	out := map[string]string{}
 	for _, file := range in {
@@ -23,9 +28,11 @@ func WriteFilesFromTemplate(in []ConfigFileValues, templatePath, outPath string)
 		err := tmpl.Execute(&b, file)
 		if err != nil {
 			fmt.Println(err)
-			return err
+			return false, err
 		}
 
+		hash := sha256.New()
+		newHashMap[file.Name] = hash.Sum(b.Bytes())
 		out[file.Name] = b.String()
 	}
 
@@ -37,5 +44,27 @@ func WriteFilesFromTemplate(in []ConfigFileValues, templatePath, outPath string)
 		ioutil.WriteFile(filePath, []byte(content), 0644)
 	}
 
-	return nil
+	changed := hasHashMapChanged(newHashMap, hashMap)
+	hashMap = newHashMap
+
+	return changed, nil
+}
+
+func hasHashMapChanged(new, old map[string][]byte) bool {
+	if len(new) != len(old) {
+		return true
+	}
+
+	for key, value := range new {
+		oldValue, exists := old[key]
+		if !exists {
+			return true
+		}
+
+		if string(value) != string(oldValue) {
+			return true
+		}
+	}
+
+	return false
 }

@@ -98,9 +98,13 @@ func reload(client *connector.Client) error {
 	}
 
 	conf := configgenerate.GenerateConfigFileValuesFromIngresses(ingress, services)
-	err = configgenerate.WriteFilesFromTemplate(conf, getTemplatePath(), getIngressPath())
+	changed, err := configgenerate.WriteFilesFromTemplate(conf, getTemplatePath(), getIngressPath())
 	if err != nil {
 		return err
+	}
+
+	if !changed {
+		return nil
 	}
 
 	nginx := exec.Command("nginx", "-s", "reload")
