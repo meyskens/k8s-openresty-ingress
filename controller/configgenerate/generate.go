@@ -38,8 +38,8 @@ func GenerateConfigFileValuesFromIngresses(ingresses []extensions_v1beta1.Ingres
 			allowHTTP = allowHTTPValue == "true"
 		}
 
-		values := []ConfigValues{}
 		for _, rule := range ingress.Spec.Rules {
+			values := []ConfigValues{}
 			for _, path := range rule.HTTP.Paths {
 				if path.Backend.ServicePort.Type == intstr.String {
 					log.Println("String port values are not yet supported")
