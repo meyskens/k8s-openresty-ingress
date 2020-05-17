@@ -1,3 +1,8 @@
+# No longer maintained
+
+I do no longer maintain this project, if you are interested in using it I reccomend forking it.
+There is a fork of this that uses a redis backend to talk to OpenResty which is still maintained, you can find it at [github.com/meyskens/k8s-openresty-ingress-redis](https://github.com/meyskens/k8s-openresty-ingress-redis)
+
 Kubernetes OpenResty Ingress Controller
 =======================================
 
